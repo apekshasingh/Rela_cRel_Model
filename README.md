@@ -7,4 +7,4 @@ Model_Script: Contains NFkB Math Model Code
 
 Baseline_Simulations: Contains baseline simulations of Rela and cRel in response to 7 stimuli and comparison between experimental and model trajectories (RMSD, features)
 
-Parameter_Variation: Vary binding affinity of IkB's and NFkB's as well as IKK and IkB's.  Must unzip simulation_results.zip prior to executing code.
+Parameter_Variation: Vary binding affinity of IkB's and NFkB's as well as IKK and IkB's.  Must unzip files in simulation_results subdirectory and run generate_simulation_results_files.m prior to executing analysis in main directory.
