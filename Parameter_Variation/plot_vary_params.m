@@ -66,7 +66,8 @@ TNF_feats_c = [TNF_feats_c, feats_c];
 [feats_r, feats_c] = get_traj_feats(traj_rela(:, 2),  traj_crel(:, 2));
 LPS_feats_r = [LPS_feats_r, feats_r];
 LPS_feats_c = [LPS_feats_c, feats_c];
-traj_feats = normalize([TNF_feats_r; TNF_feats_c; LPS_feats_r; LPS_feats_c]');
+%traj_feats = normalize([TNF_feats_r; TNF_feats_c; LPS_feats_r; LPS_feats_c]');
+traj_feats = normalize([TNF_feats_r-TNF_feats_c; LPS_feats_r-LPS_feats_c]');
 clear("params", "feats_r", "feats_c", "TNF_feats_r", "TNF_feats_c", "LPS_feats_r", "LPS_feats_c", "traj_rela", "traj_crel")
 %% Convert Parameters to Kd
 params_collect(1, :) = params_collect(1, :)/200;
@@ -77,6 +78,7 @@ params_collect(5, :) = 38./params_collect(5, :);
 params_collect(6, :) = 38./params_collect(6, :);
 param_names = ["IkBa-Rela Kd", "IkBe-cRel Kd", "IkBa-cRel Kd", "IkBe-Rela Kd", "IKK-IkBa Kd", "IKK-IkBe Kd"]; 
 %% Define Clusters based on Features
+rng(1)
 [idx, C, sumd, D] = kmeans(traj_feats, 5);
 rela_col = sscanf('155098','%2x%2x%2x',[1 3])/255;
 crel_col = sscanf('C4005B','%2x%2x%2x',[1 3])/255;
