@@ -12,13 +12,12 @@ model_path = strcat(fpath(1:search(end-1)), "Model_Script/");
 run_TNF = true;
 run_lps = true;
 run_cpg= true;
-run_pam= true;
 run_poly=true;
 run_fla=true;
 run_r84=true;
-%% Specify Parameter Modification
-modify_IkBeRelA = false;
-modify_IKKIkBe = false;
+run_pam= true;
+
+plot_order = [7, 1, 3, 4, 2, 5, 6];
 %% Specify Plotting Options
 plot_expt = true;
 plot_rmsd = true;
@@ -53,7 +52,7 @@ for i = 1:5
     r_color(i,:) = [sscanf(rela_color(i,2:end),'%2x%2x%2x',[1 3])/255,0.6];
     c_color(i,:) = [sscanf(crel_color(i,2:end),'%2x%2x%2x',[1 3])/255,0.6];
 end
-
+p_mod = [];
 %% TNF SIMULATION
 cd(fpath)
 if run_TNF
@@ -61,19 +60,6 @@ if run_TNF
     tnf(:,1) = [];
     tnf = tnf(tnf(:,1)<length_t,:);
     
-    if modify_IkBeRelA %original dissociation 0.08 (KD = 0.0014 to KD = 6.3937e-07)
-        p_mod = [
-            59 1 0.00003576
-            61 1 0.00003576];
-    elseif modify_IKKIkBe %original dissociation 38 (KD = 0.8235 to KD = 0.20)
-        p_mod = [
-            45 1 9.228
-            46 1 9.228
-            65 1 9.228];
-    else
-        p_mod = [];
-    end
-
     dose_scale = 1/5200; % Dose scaling from Shannon et al (2007)
     doses = [10];
     
@@ -132,15 +118,15 @@ if run_TNF
     
     if plot_rmsd
         for cell = 1:5
-            RMSD_vals(cell, :, 1) = calculate_RMSD(tnf(:,(3*(cell-1))+1),tnf(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, 1), crel_ratio(:, 1), relative_rmsd);
+            RMSD_vals(cell, :, plot_order(1)) = calculate_RMSD(tnf(:,(3*(cell-1))+1),tnf(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, 1), crel_ratio(:, 1), relative_rmsd);
         end
     end
     
     if plot_feats
         for cell = 1:5
-            feat_vals(cell, :, 1) = calculate_feats(tnf(:,(3*(cell-1))+1),tnf(:,(3*(cell-1))+(2:3)),time);
+            feat_vals(cell, :, plot_order(1)) = calculate_feats(tnf(:,(3*(cell-1))+1),tnf(:,(3*(cell-1))+(2:3)),time);
         end
-        feat_vals(6, :, 1) = calculate_feats(nan,[rela_ratio(:, 1), crel_ratio(:, 1)],time);
+        feat_vals(6, :, plot_order(1)) = calculate_feats(nan,[rela_ratio(:, 1), crel_ratio(:, 1)],time);
     end
 end
 %% LPS Simulation
@@ -149,19 +135,6 @@ if run_lps
     lps = readmatrix('lps.csv');
     lps(:,1) = [];
     lps = lps(lps(:,1)<length_t,:);
-    
-    if modify_IkBeRelA
-        p_mod = [
-            59 1 0.00003576
-            61 1 0.00003576];
-    elseif modify_IKKIkBe
-        p_mod = [
-            45 1 9.228
-            46 1 9.228
-            65 1 9.228];
-    else
-        p_mod = [];
-    end
 
     %LPS Simulation
     doses = [10];
@@ -217,15 +190,15 @@ if run_lps
     hold off
     if plot_rmsd
         for cell = 1:5
-            RMSD_vals(cell, :, 4) = calculate_RMSD(lps(:,(3*(cell-1))+1),lps(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, 2), crel_ratio(:,2), relative_rmsd);
+            RMSD_vals(cell, :, plot_order(2)) = calculate_RMSD(lps(:,(3*(cell-1))+1),lps(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, 2), crel_ratio(:,2), relative_rmsd);
         end
     end
     
     if plot_feats
         for cell = 1:5
-            feat_vals(cell, :, 4) = calculate_feats(lps(:,(3*(cell-1))+1),lps(:,(3*(cell-1))+(2:3)),time);
+            feat_vals(cell, :, plot_order(2)) = calculate_feats(lps(:,(3*(cell-1))+1),lps(:,(3*(cell-1))+(2:3)),time);
         end
-        feat_vals(6, :, 4) = calculate_feats(nan,[rela_ratio(:, 2), crel_ratio(:, 2)],time);
+        feat_vals(6, :, plot_order(2)) = calculate_feats(nan,[rela_ratio(:, 2), crel_ratio(:, 2)],time);
     end
 end
 %% CpG Simulation
@@ -234,19 +207,6 @@ if run_cpg
     cpg = readmatrix('cpg.csv');
     cpg(:,1) = [];
     cpg = cpg(cpg(:,1)<length_t,:);
-
-    if modify_IkBeRelA
-        p_mod = [
-            59 1 0.00003576
-            61 1 0.00003576];
-    elseif modify_IKKIkBe
-        p_mod = [
-            45 1 9.228
-            46 1 9.228
-            65 1 9.228];
-    else
-        p_mod = [];
-    end
 
     doses = [25];
     dose_scale = 0.14185; % Convert to uM (from ug/ml)
@@ -300,15 +260,15 @@ if run_cpg
     hold off
     if plot_rmsd
         for cell = 1:5
-            RMSD_vals(cell, :, 7) = calculate_RMSD(cpg(:,(3*(cell-1))+1),cpg(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, 3), crel_ratio(:, 3), relative_rmsd);
+            RMSD_vals(cell, :, plot_order(3)) = calculate_RMSD(cpg(:,(3*(cell-1))+1),cpg(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, 3), crel_ratio(:, 3), relative_rmsd);
         end
     end
     
     if plot_feats
         for cell = 1:5
-            feat_vals(cell, :, 7) = calculate_feats(cpg(:,(3*(cell-1))+1),cpg(:,(3*(cell-1))+(2:3)),time);
+            feat_vals(cell, :, plot_order(3)) = calculate_feats(cpg(:,(3*(cell-1))+1),cpg(:,(3*(cell-1))+(2:3)),time);
         end
-        feat_vals(6, :, 7) = calculate_feats(nan,[rela_ratio(:, 3), crel_ratio(:, 3)],time);
+        feat_vals(6, :, plot_order(3)) = calculate_feats(nan,[rela_ratio(:, 3), crel_ratio(:, 3)],time);
     end
 end
 %% Poly(I:C) Simulation
@@ -317,19 +277,6 @@ if run_poly
     poly = readmatrix('poly.csv');
     poly(:,1) = [];
     poly = poly(poly(:,1)<length_t,:);
-    
-    if modify_IkBeRelA
-        p_mod = [
-            59 1 0.00003576
-            61 1 0.00003576];
-    elseif modify_IKKIkBe
-        p_mod = [
-            45 1 9.228
-            46 1 9.228
-            65 1 9.228];
-    else
-        p_mod = [];
-    end
 
     doses = 1000*[20];
     dose_scale = 1/5e6; % Convert to uM. PolyI:C molecular weight: 1000KDa(+)
@@ -387,15 +334,15 @@ if run_poly
     hold off
     if plot_rmsd
         for cell = 1:5
-            RMSD_vals(cell, :, 3) = calculate_RMSD(poly(:,(3*(cell-1))+1),poly(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, 4), crel_ratio(:, 4), relative_rmsd);
+            RMSD_vals(cell, :, plot_order(4)) = calculate_RMSD(poly(:,(3*(cell-1))+1),poly(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, 4), crel_ratio(:, 4), relative_rmsd);
         end
     end
     
     if plot_feats
         for cell = 1:5
-            feat_vals(cell, :, 3) = calculate_feats(poly(:,(3*(cell-1))+1),poly(:,(3*(cell-1))+(2:3)),time);
+            feat_vals(cell, :, plot_order(4)) = calculate_feats(poly(:,(3*(cell-1))+1),poly(:,(3*(cell-1))+(2:3)),time);
         end
-        feat_vals(6, :, 3) = calculate_feats(nan,[rela_ratio(:, 4), crel_ratio(:, 4)],time);
+        feat_vals(6, :, plot_order(4)) = calculate_feats(nan,[rela_ratio(:, 4), crel_ratio(:, 4)],time);
     end
 end
 %% FLAGELLIN Simulation
@@ -404,19 +351,6 @@ if run_fla
     fla = readmatrix('fla.csv');
     fla(:,1) = [];
     fla = fla(fla(:,1)<length_t,:);
-    
-   if modify_IkBeRelA
-        p_mod = [
-            59 1 0.00003576
-            61 1 0.00003576];
-    elseif modify_IKKIkBe
-        p_mod = [
-            45 1 9.228
-            46 1 9.228
-            65 1 9.228];
-    else
-        p_mod = [];
-    end
 
     doses = [250]; %250 ng/mL; Flagellin = 50kDa
     dose_scale = 1/50000; % convert ng/mL to uM
@@ -471,15 +405,15 @@ if run_fla
     hold off
     if plot_rmsd
         for cell = 1:5
-            RMSD_vals(cell, :, 5) = calculate_RMSD(fla(:,(3*(cell-1))+1),fla(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, 5), crel_ratio(:, 5), relative_rmsd);
+            RMSD_vals(cell, :, plot_order(5)) = calculate_RMSD(fla(:,(3*(cell-1))+1),fla(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, 5), crel_ratio(:, 5), relative_rmsd);
         end
     end
     
     if plot_feats
         for cell = 1:5
-            feat_vals(cell, :, 5) = calculate_feats(fla(:,(3*(cell-1))+1),fla(:,(3*(cell-1))+(2:3)),time);
+            feat_vals(cell, :, plot_order(5)) = calculate_feats(fla(:,(3*(cell-1))+1),fla(:,(3*(cell-1))+(2:3)),time);
         end
-        feat_vals(6, :, 5) = calculate_feats(nan,[rela_ratio(:, 5), crel_ratio(:, 5)],time);
+        feat_vals(6, :, plot_order(5)) = calculate_feats(nan,[rela_ratio(:, 5), crel_ratio(:, 5)],time);
     end
 end
 %% R848 Simulation
@@ -488,19 +422,6 @@ if run_r84
     r84 = readmatrix('r84.csv');
     r84(:,1) = [];
     r84 = r84(r84(:,1)<length_t,:);
-
-   if modify_IkBeRelA
-        p_mod = [
-            59 1 0.00003576
-            61 1 0.00003576];
-    elseif modify_IKKIkBe
-        p_mod = [
-            45 1 9.228
-            46 1 9.228
-            65 1 9.228];
-    else
-        p_mod = [];
-    end
 
     doses = [350]; %350 ng/mL; R848 = 314 g/mol
     dose_scale = 1/314; % convert ng/mL to uM
@@ -555,15 +476,15 @@ if run_r84
     hold off
     if plot_rmsd
         for cell = 1:5
-            RMSD_vals(cell, :, 6) = calculate_RMSD(r84(:,(3*(cell-1))+1),r84(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, 6), crel_ratio(:, 6), relative_rmsd);
+            RMSD_vals(cell, :, plot_order(6)) = calculate_RMSD(r84(:,(3*(cell-1))+1),r84(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, 6), crel_ratio(:, 6), relative_rmsd);
         end
     end
     
      if plot_feats
         for cell = 1:5
-            feat_vals(cell, :, 6) = calculate_feats(r84(:,(3*(cell-1))+1),r84(:,(3*(cell-1))+(2:3)),time);
+            feat_vals(cell, :, plot_order(6)) = calculate_feats(r84(:,(3*(cell-1))+1),r84(:,(3*(cell-1))+(2:3)),time);
         end
-        feat_vals(6, :, 6) = calculate_feats(nan,[rela_ratio(:, 6), crel_ratio(:, 6)],time);
+        feat_vals(6, :, plot_order(6)) = calculate_feats(nan,[rela_ratio(:, 6), crel_ratio(:, 6)],time);
     end
 end
 %% PAM3CSK Simulation
@@ -572,19 +493,6 @@ if run_pam
     pam = readmatrix('pam.csv');
     pam(:,1) = [];
     pam = pam(pam(:,1)<length_t,:);
-    
-    if modify_IkBeRelA
-        p_mod = [
-            59 1 0.00003576
-            61 1 0.00003576];
-    elseif modify_IKKIkBe
-        p_mod = [
-            45 1 9.228
-            46 1 9.228
-            65 1 9.228];
-    else
-        p_mod = [];
-    end
 
     doses = [40];
     dose_scale = 1/1500; % Convert to uM. Pam3CSK molecular weight: 1.5KDa
@@ -649,15 +557,15 @@ if run_pam
     hold off
     if plot_rmsd
         for cell = 1:5
-            RMSD_vals(cell, :, 2) = calculate_RMSD(pam(:,(3*(cell-1))+1),pam(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, 7), crel_ratio(:, 7), relative_rmsd);
+            RMSD_vals(cell, :, plot_order(7)) = calculate_RMSD(pam(:,(3*(cell-1))+1),pam(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, 7), crel_ratio(:, 7), relative_rmsd);
         end
     end
     
     if plot_feats
         for cell = 1:5
-            feat_vals(cell, :, 2) = calculate_feats(pam(:,(3*(cell-1))+1),pam(:,(3*(cell-1))+(2:3)),time);
+            feat_vals(cell, :, plot_order(7)) = calculate_feats(pam(:,(3*(cell-1))+1),pam(:,(3*(cell-1))+(2:3)),time);
         end
-        feat_vals(6, :, 2) = calculate_feats(nan,[rela_ratio(:, 7), crel_ratio(:, 7)],time);
+        feat_vals(6, :, plot_order(7)) = calculate_feats(nan,[rela_ratio(:, 7), crel_ratio(:, 7)],time);
     end
 end
 %% Plot RMSD of Model Simulations vs Experimental Measurements
@@ -686,7 +594,7 @@ if plot_rmsd
     if relative_rmsd
         ylabel("Relative RMSD")
         ylim([0, 3])
-        xticklabels({[], "TNF", "Pam3CSK", "Poly(I:C)", "LPS", "Flagellin", "R848", "CpG", []}) 
+        xticklabels({[], "LPS", "Flagellin", "CpG", "Poly(I:C)", "R848", "Pam3CSK4", "TNF", []}) 
         xtickangle(45)
     else
         ylabel("RMSD")
@@ -695,13 +603,13 @@ if plot_rmsd
         % generate shuffled RMSD
         shuff_RMSD = zeros(5, 2, 7);
         for cell = 1:5
-            shuff_RMSD(cell, :, 1) = calculate_RMSD(tnf(:,(3*(cell-1))+1),tnf(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, index(1)), crel_ratio(:, index(1)), relative_rmsd);
-            shuff_RMSD(cell, :, 4) = calculate_RMSD(lps(:,(3*(cell-1))+1),lps(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, index(2)), crel_ratio(:, index(2)), relative_rmsd);
-            shuff_RMSD(cell, :, 7) = calculate_RMSD(cpg(:,(3*(cell-1))+1),cpg(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, index(3)), crel_ratio(:, index(3)), relative_rmsd);
-            shuff_RMSD(cell, :, 3) = calculate_RMSD(poly(:,(3*(cell-1))+1),poly(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, index(4)), crel_ratio(:, index(4)), relative_rmsd);
-            shuff_RMSD(cell, :, 5) = calculate_RMSD(fla(:,(3*(cell-1))+1),fla(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, index(5)), crel_ratio(:, index(5)), relative_rmsd);
-            shuff_RMSD(cell, :, 6) = calculate_RMSD(r84(:,(3*(cell-1))+1),r84(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, index(6)), crel_ratio(:, index(6)), relative_rmsd);
-            shuff_RMSD(cell, :, 2) = calculate_RMSD(pam(:,(3*(cell-1))+1),pam(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, index(7)), crel_ratio(:, index(7)), relative_rmsd);
+            shuff_RMSD(cell, :, plot_order(1)) = calculate_RMSD(tnf(:,(3*(cell-1))+1),tnf(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, index(1)), crel_ratio(:, index(1)), relative_rmsd);
+            shuff_RMSD(cell, :, plot_order(2)) = calculate_RMSD(lps(:,(3*(cell-1))+1),lps(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, index(2)), crel_ratio(:, index(2)), relative_rmsd);
+            shuff_RMSD(cell, :, plot_order(3)) = calculate_RMSD(cpg(:,(3*(cell-1))+1),cpg(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, index(3)), crel_ratio(:, index(3)), relative_rmsd);
+            shuff_RMSD(cell, :, plot_order(4)) = calculate_RMSD(poly(:,(3*(cell-1))+1),poly(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, index(4)), crel_ratio(:, index(4)), relative_rmsd);
+            shuff_RMSD(cell, :, plot_order(5)) = calculate_RMSD(fla(:,(3*(cell-1))+1),fla(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, index(5)), crel_ratio(:, index(5)), relative_rmsd);
+            shuff_RMSD(cell, :, plot_order(6)) = calculate_RMSD(r84(:,(3*(cell-1))+1),r84(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, index(6)), crel_ratio(:, index(6)), relative_rmsd);
+            shuff_RMSD(cell, :, plot_order(7)) = calculate_RMSD(pam(:,(3*(cell-1))+1),pam(:,(3*(cell-1))+(2:3)),time, rela_ratio(:, index(7)), crel_ratio(:, index(7)), relative_rmsd);
         end
         mean_rmsd = [mean(squeeze(shuff_RMSD(:, 1, :)), 'all'), mean(squeeze(shuff_RMSD(:, 2, :)), 'all')];
         bar(8-0.2, mean_rmsd(1), 0.4, 'FaceColor', sscanf('155098','%2x%2x%2x',[1 3])/255);
@@ -717,7 +625,7 @@ if plot_rmsd
             er.Color = [0 0 0];                            
             er.LineStyle = 'none';  
         end
-        xticklabels({[], "TNF", "Pam3CSK", "Poly(I:C)", "LPS", "Flagellin", "R848", "CpG", "shuffled"}) 
+        xticklabels({[], "LPS", "Flagellin", "CpG", "Poly(I:C)", "R848", "Pam3CSK4", "TNF", "shuffled"}) 
         xtickangle(45)
     end
     hold off
@@ -740,7 +648,7 @@ if plot_feats
     end
     hold off
     ylabel("Peak Amp")
-    xticklabels({[], "TNF", "Pam3CSK", "Poly(I:C)", "LPS", "Flagellin", "R848", "CpG", []}) 
+    xticklabels({[], "LPS", "Flagellin", "CpG", "Poly(I:C)", "R848", "Pam3CSK4", "TNF", []}) 
     xtickangle(45)
     
 %     figure()
@@ -759,7 +667,7 @@ if plot_feats
 %     end
 %     hold off
 %     ylabel("Peak Time")
-%     xticklabels({[], "TNF", "Pam3CSK", "Poly(I:C)", "LPS", "Flagellin", "R848", "CpG", []}) 
+%     xticklabels({[],  "LPS", "Flagellin", "CpG", "Poly(I:C)", "R848", "Pam3CSK4", "TNF", []}) 
 %     xtickangle(45)
     
     figure()
@@ -778,7 +686,7 @@ if plot_feats
     end
     hold off
     ylabel("Activity")
-    xticklabels({[], "TNF", "Pam3CSK", "Poly(I:C)", "LPS", "Flagellin", "R848", "CpG", []}) 
+    xticklabels({[], "LPS", "Flagellin", "CpG", "Poly(I:C)", "R848", "Pam3CSK4", "TNF", []}) 
     xtickangle(45)
     
 %     figure()
@@ -797,6 +705,6 @@ if plot_feats
 %     end
 %     hold off
 %     ylabel("Time Half Max")
-%     xticklabels({[], "TNF", "Pam3CSK", "Poly(I:C)", "LPS", "Flagellin", "R848", "CpG", []}) 
+%     xticklabels({[],  "LPS", "Flagellin", "CpG", "Poly(I:C)", "R848", "Pam3CSK4", "TNF", []}) 
 %     xtickangle(45)
 end
