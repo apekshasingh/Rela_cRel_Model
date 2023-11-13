@@ -25,7 +25,7 @@ modify_IKKIkBe = false;
 plot_expt = true;
 plot_sim = false;
 %% Plotting experimental data and model simulations
-length_t = 8;
+length_t = 12;
 
 untran_r = 0.100;
 untran_c = 0.025;
