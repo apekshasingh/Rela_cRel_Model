@@ -67,7 +67,7 @@ TNF_feats_c = [TNF_feats_c, feats_c];
 LPS_feats_r = [LPS_feats_r, feats_r];
 LPS_feats_c = [LPS_feats_c, feats_c];
 %traj_feats = normalize([TNF_feats_r; TNF_feats_c; LPS_feats_r; LPS_feats_c]');
-traj_feats = normalize([TNF_feats_r-TNF_feats_c; LPS_feats_r-LPS_feats_c]');
+traj_feats = normalize([TNF_feats_r - TNF_feats_c; LPS_feats_r - LPS_feats_c]');
 clear("params", "feats_r", "feats_c", "TNF_feats_r", "TNF_feats_c", "LPS_feats_r", "LPS_feats_c", "traj_rela", "traj_crel")
 %% Convert Parameters to Kd
 params_collect(1, :) = params_collect(1, :)/200;
@@ -78,14 +78,14 @@ params_collect(5, :) = 38./params_collect(5, :);
 params_collect(6, :) = 38./params_collect(6, :);
 param_names = ["IkBa-Rela Kd", "IkBe-cRel Kd", "IkBa-cRel Kd", "IkBe-Rela Kd", "IKK-IkBa Kd", "IKK-IkBe Kd"]; 
 %% Define Clusters based on Features
-rng(1)
-[idx, C, sumd, D] = kmeans(traj_feats, 5);
+rng(5)
+[idx, C, sumd, D] = kmeans(traj_feats, 6);
 rela_col = sscanf('155098','%2x%2x%2x',[1 3])/255;
 crel_col = sscanf('C4005B','%2x%2x%2x',[1 3])/255;
 sim_time = linspace(0,options.SIM_TIME/60,options.SIM_TIME+1);
 %find representatives for each cluster & plot
 clus_rep = zeros(1, 5);
-for clus = 1:5
+for clus = 1:6
    [~, id] = min(D(:, clus));
    clus_rep(clus) = id;
    sumd(clus) = sumd(clus)/sum(idx==clus);
@@ -99,6 +99,11 @@ for clus = 1:5
    title(strcat("Cluster ", num2str(clus), ":TNF"))
    ylabel("Nuclear/Total")
    xlabel("Time (hr)")
+   %set(gca, 'XTickLabel', [], 'YTickLabel', [])
+   %pos = get(gca, 'Position');
+   %pos(1) = pos(1)-0.075;
+   %pos(3) = pos(3)+0.1;
+   %set(gca, 'Position', pos)
    subplot(1, 2, 2)
    plot(sim_time, traj_rela_collect(:, 2, id), 'Color', rela_col, 'LineWidth', 2)
    hold on
@@ -107,6 +112,11 @@ for clus = 1:5
    ylim([0, 2])
    xlim([0, options.SIM_TIME/60])
    title(strcat("Cluster ", num2str(clus), ":LPS"))
+   %set(gca, 'XTickLabel', [], 'YTickLabel', [])
+   %pos = get(gca, 'Position');
+   %pos(1) = pos(1)-0.075;
+   %pos(3) = pos(3)+0.1;
+   %set(gca, 'Position', pos)
 end
 hold off
 
@@ -139,19 +149,23 @@ title("Avg Dist from Cluster Mean")
 
 figure()
 [coef, score, ~, ~, explained] = pca(traj_feats);
-for i= 1:5
+for i= 1:6
     scatter(score(idx==i, 1), score(idx==i, 2), 1, "filled");
     hold on
 end
-scatter(score(end, 1), score(end, 2), 100, "k", 'Marker', "x");
+scatter(score(end, 1), score(end, 2), 250, "k", 'Marker', "x");
 xlabel(strcat("PC 1 (", num2str(explained(1)), "%)"))
 ylabel(strcat("PC 2 (", num2str(explained(2)), "%)"))
+xlim([-10, 10])
+ylim([-7, 8])
 
-figure()
 for i = 1:6
     figure()
     scatter(score(:, 1), score(:, 2), 1, params_collect(i, :), 'filled')
     xlabel(strcat("PC 1 (", num2str(explained(1)), "%)"))
     ylabel(strcat("PC 2 (", num2str(explained(2)), "%)"))
     title(param_names(i))
+    xlim([-10, 10])
+    ylim([-7, 8])
+    colorbar()
 end

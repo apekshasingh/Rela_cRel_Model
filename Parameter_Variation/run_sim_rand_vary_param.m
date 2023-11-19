@@ -14,16 +14,15 @@ for i = 1:iter
     traj_rela = zeros(721, 2, num_samples);
     traj_crel = zeros(721, 2, num_samples);
     params = zeros(6, num_samples);
-    cd(model_path)
     parfor n=1:num_samples
-        [traj_rela(:, :, n) , traj_crel(:, :, n), params(:, n)] = simulate_param_vary()
+        [traj_rela(:, :, n) , traj_crel(:, :, n), params(:, n)] = simulate_param_vary(model_path)
     end
     cd(fpath)
     save(strcat('simulation_results_', num2str(i), '.mat'), 'traj_rela', 'traj_crel', 'params')
 end
 %% Parameter Variation Simulation Function
-function [traj_rela, traj_crel, params] = simulate_param_vary()
-
+function [traj_rela, traj_crel, params] = simulate_param_vary(model_path)
+cd(model_path)
 params = rand(1, 6);
 
 %IkB-NFkB Kd

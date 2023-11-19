@@ -11,8 +11,12 @@ ta_r = trapz(traj_rela);
 ta_c = trapz(traj_crel);
 
 % time up to half max
-[~, hm_r] = max((traj_rela>=(pk_r/2)), [], 1);
-[~, hm_c] = max((traj_crel>=(pk_c/2)), [], 1);
+%[~, hm_r] = max((traj_rela>=(pk_r/2)), [], 1);
+%[~, hm_c] = max((traj_crel>=(pk_c/2)), [], 1);
+
+% time to peak
+[~, hm_r] = max((traj_rela>=(pk_r/1)), [], 1);
+[~, hm_c] = max((traj_crel>=(pk_c/1)), [], 1);
 
 % number of peaks
 npk_r = zeros(1, size(traj_rela, 2));
