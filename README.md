@@ -3,7 +3,7 @@ Ordinary Differential Equation (ODE) model of NFkB signaling network in macropha
 
 Analysis and Visualizations for Math Modeling results presented in "Co-Imaging of RelA and c-Rel Reveals Features of NF-kappaB Signaling for Ligand Discrimination" (Rahman et al., 2023)
 
-Model_Script: Contains NFkB Math Model Code
+Model_Script: Contains NFkB Math Model Code (adapted from Adelaja et al. 2021)
 
 Baseline_Simulations: Contains baseline simulations of Rela and cRel in response to 7 stimuli and comparison between experimental and model trajectories (RMSD, features)
 
