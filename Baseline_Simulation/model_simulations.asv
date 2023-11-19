@@ -111,7 +111,7 @@ if run_TNF
     title('TNF Simulation')
     xlabel('Time(hr)')
     ylabel('Nuclear/Total Cell Intensity')
-    axis([0 options.SIM_TIME/60 0 2])
+    axis([0 options.SIM_TIME/60 0 1.5])
     
     plot(time, rela_ratio(:,1),'Color',sscanf('155098','%2x%2x%2x',[1 3])/255, 'LineWidth',4)
     plot(time, crel_ratio(:,1),'Color',sscanf('C4005B','%2x%2x%2x',[1 3])/255,'LineWidth',4)
@@ -186,7 +186,7 @@ if run_lps
     title('LPS Simulation')
     xlabel('Time(hr)')
     ylabel('Nuclear/Total Cell Intensity')
-    axis([0 options.SIM_TIME/60 0 2])
+    axis([0 options.SIM_TIME/60 0 2.5])
 
     plot(time, rela_ratio(:,2),'Color',sscanf('155098','%2x%2x%2x',[1 3])/255, 'LineWidth',4)
     plot(time, crel_ratio(:,2),'Color',sscanf('C4005B','%2x%2x%2x',[1 3])/255,'LineWidth',4)
@@ -258,7 +258,7 @@ if run_cpg
     title('CpG Simulation')
     xlabel('Time(hr)')
     ylabel('Nuclear/Total Cell Intensity')
-    axis([0 options.SIM_TIME/60 0 2])
+    axis([0 options.SIM_TIME/60 0 2.5])
 
     plot(time, rela_ratio(:,3),'Color',sscanf('155098','%2x%2x%2x',[1 3])/255, 'LineWidth',4)
     plot(time, crel_ratio(:,3),'Color',sscanf('C4005B','%2x%2x%2x',[1 3])/255, 'LineWidth',4)
@@ -403,7 +403,7 @@ if run_fla
     title('Flagellin Simulation')
     xlabel('Time(hr)')
     ylabel('Nuclear/Total Cell Intensity')
-    axis([0 options.SIM_TIME/60 0 2])
+    axis([0 options.SIM_TIME/60 0 2.5])
 
     plot(time, rela_ratio(:,5),'Color',sscanf('155098','%2x%2x%2x',[1 3])/255, 'LineWidth',4)
     plot(time, crel_ratio(:,5),'Color',sscanf('C4005B','%2x%2x%2x',[1 3])/255,'LineWidth',4)
@@ -462,7 +462,7 @@ if run_r84
     crel(:,6) = crel_nuc;
     crel_total = (3.5*crel_cyto+crel_nuc)/4.5;
     crel_ratio(:,6) = crel_nuc/(crel_total(1)+untran_c);
-    crel_ratio(:,6) = crel_ratio(:,6) - crel_ratio(1,6);
+    crel_ratio(:,5) = relaratio(:,5) - rela_ratio(1,5);
 
     %Real Data
     if plot_expt
@@ -476,7 +476,7 @@ if run_r84
     title('R848 Simulation')
     xlabel('Time(hr)')
     ylabel('Nuclear/Total Cell Intensity')
-    axis([0 options.SIM_TIME/60 0 2])
+    axis([0 options.SIM_TIME/60 0 2.5])
     
     plot(time, rela_ratio(:,6),'Color',sscanf('155098','%2x%2x%2x',[1 3])/255, 'LineWidth',4)
     plot(time, crel_ratio(:,6),'Color',sscanf('C4005B','%2x%2x%2x',[1 3])/255,'LineWidth',4)
@@ -527,25 +527,23 @@ if run_pam
     rela_cyto = sum(output_pam(:,1:5),2);
     rela_nuc = sum(output_pam(:,6:8),2);
     rela(:,7) = rela_nuc;
-    rela_cyto = [repmat(rela_cyto(1,1),90,1);rela_cyto];
-    rela_nuc = [repmat(rela_nuc(1,1),90,1);rela_nuc];
+    rela_cyto = [repmat(rela_cyto(1,1),75,1);rela_cyto];
+    rela_nuc = [repmat(rela_nuc(1,1),75,1);rela_nuc];
     rela_cyto = rela_cyto(1:size(rela_ratio,1),:);
     rela_nuc = rela_nuc(1:size(rela_ratio,1),:);
     rela_total = (3.5*rela_cyto+rela_nuc)/4.5;
     rela_ratio(:,7) = rela_nuc/(rela_total(1)+untran_r);
-    rela_ratio(:,7) = rela_ratio(:,7) - rela_ratio(1,7);
 
     %cRel Calculations
     crel_cyto = sum(output_pam(:,9:13),2);
     crel_nuc = sum(output_pam(:,14:16),2);
     crel(:,7) = crel_nuc;
-    crel_cyto = [repmat(crel_cyto(1,1),90,1);crel_cyto];
-    crel_nuc = [repmat(crel_nuc(1,1),90,1);crel_nuc];
+    crel_cyto = [repmat(crel_cyto(1,1),75,1);crel_cyto];
+    crel_nuc = [repmat(crel_nuc(1,1),75,1);crel_nuc];
     crel_cyto = crel_cyto(1:size(crel_ratio,1),:);
     crel_nuc = crel_nuc(1:size(crel_ratio,1),:);
     crel_total = (3.5*crel_cyto+crel_nuc)/4.5;
     crel_ratio(:,7) = crel_nuc/(crel_total(1)+untran_c);
-    crel_ratio(:,7) = crel_ratio(:,7) - crel_ratio(1,7);
 
     %Real Data
     if plot_expt
@@ -559,7 +557,7 @@ if run_pam
     title('Pam3CSK Simulation')
     xlabel('Time(hr)')
     ylabel('Nuclear/Total Cell Intensity')
-    axis([0 options.SIM_TIME/60 0 2])
+    axis([0 options.SIM_TIME/60 0 2.5])
 
     plot(time, rela_ratio(:,7),'Color',sscanf('155098','%2x%2x%2x',[1 3])/255, 'LineWidth',4)
     plot(time, crel_ratio(:,7),'Color',sscanf('C4005B','%2x%2x%2x',[1 3])/255,'LineWidth',4)
